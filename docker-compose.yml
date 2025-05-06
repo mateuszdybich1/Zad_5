@@ -1,0 +1,49 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "${DB_PASSWORD}"
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    healthcheck:
+      test:
+        - CMD
+        - /opt/mssql-tools/bin/sqlcmd
+        - -S
+        - "${DB_HOST}, ${DB_PORT}"
+        - -U
+        - "${DB_USER}"
+        - -P
+        - "${DB_PASSWORD}"
+        - -Q
+        - "SELECT 1"
+      interval: 10s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST:     "${BACKEND_DB_HOST}"
+      DB_USER:     "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      JWT_SECRET:  "${JWT_SECRET}"
+      JWT_ISSUER:  "${JWT_ISSUER}"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_HOST: "${REACT_APP_API_HOST}"
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"

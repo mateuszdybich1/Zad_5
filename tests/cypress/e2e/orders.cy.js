@@ -46,13 +46,17 @@ describe('Orders API', () => {
         }).then((resp) => {
             expect(resp.status).to.eq(201);
             expect(resp.body).to.have.property('orderId');
+            expect(resp.body.orderId).to.be.a('string');
+            expect(resp.body.orderId.length).to.be.greaterThan(5);
+            expect(resp.body).to.not.be.null;
         });
     });
 
-    it('Should not create order without token', () => {
+    it('Should not create with empty token', () => {
         cy.request({
             method: 'POST',
             url: '/orders',
+            headers: { Authorization: `Bearer ` },
             body: { items: [{ id: productId, quantity: 1 }] },
             failOnStatusCode: false
         }).then((resp) => {
@@ -60,7 +64,7 @@ describe('Orders API', () => {
         });
     });
 
-    it('Should not create order with non-existent product', () => {
+    it('Should not create order with non-existing product', () => {
         cy.request({
             method: 'POST',
             url: '/orders',
@@ -69,6 +73,7 @@ describe('Orders API', () => {
             failOnStatusCode: false
         }).then((resp) => {
             expect(resp.status).to.eq(400);
+            expect(resp.body).to.exist;
         });
     });
 
@@ -81,6 +86,7 @@ describe('Orders API', () => {
             failOnStatusCode: false
         }).then((resp) => {
             expect(resp.status).to.eq(400);
+            expect(resp.body).to.exist;
         });
     });
 
@@ -93,6 +99,7 @@ describe('Orders API', () => {
             failOnStatusCode: false
         }).then((resp) => {
             expect(resp.status).to.eq(400);
+            expect(resp.body).to.exist;
         });
     });
 
@@ -105,6 +112,7 @@ describe('Orders API', () => {
             failOnStatusCode: false
         }).then((resp) => {
             expect(resp.status).to.eq(400);
+            expect(resp.body).to.exist;
         });
     });
 
@@ -122,6 +130,9 @@ describe('Orders API', () => {
         }).then((resp) => {
             expect(resp.status).to.eq(201);
             expect(resp.body).to.have.property('orderId');
+            expect(resp.body.orderId).to.be.a('string');
+            expect(resp.body.orderId.length).to.be.greaterThan(5);
+            expect(resp.body).to.not.be.null;
         });
     });
 });

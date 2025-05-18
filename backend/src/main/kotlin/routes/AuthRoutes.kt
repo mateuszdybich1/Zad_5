@@ -6,7 +6,6 @@ import io.ktor.server.routing.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.http.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.and
@@ -18,6 +17,11 @@ data class AuthRequest(val username: String, val password: String)
 fun Route.authRoutes() {
     post("/register") {
         val req = call.receive<AuthRequest>()
+
+        if (req.username.isEmpty() || req.password.isEmpty()) {
+            call.respond(HttpStatusCode.BadRequest, "Username and password cannot be empty")
+            return@post
+        }
 
         val userRow = transaction {
             Users
@@ -48,6 +52,11 @@ fun Route.authRoutes() {
         val hash = MessageDigest.getInstance("SHA-256")
             .digest(req.password.toByteArray())
             .joinToString("") { "%02x".format(it) }
+
+        if (req.username.isEmpty() || req.password.isEmpty()) {
+            call.respond(HttpStatusCode.BadRequest, "Username and password cannot be empty")
+            return@post
+        }
 
         val userRow = transaction {
             Users

@@ -7,6 +7,8 @@ describe('Authentication API', () => {
         cy.request('POST', '/register', { username, password }).then((resp) => {
             expect(resp.status).to.eq(201);
             expect(resp.body).to.include('registered');
+            expect(resp.body).to.be.a('string');
+            expect(resp.body.length).to.be.greaterThan(5);
         });
     });
 
@@ -17,7 +19,9 @@ describe('Authentication API', () => {
             body: { username, password },
             failOnStatusCode: false
         }).then((resp) => {
-            expect([400, 409, 500]).to.include(resp.status);
+            expect(resp.status).to.eq(400);
+            expect(resp.body).to.exist;
+            expect(resp.body).to.be.a('string');
         });
     });
 
@@ -27,6 +31,7 @@ describe('Authentication API', () => {
             expect(resp.body).to.have.property('token');
             token = resp.body.token;
             expect(token.length).to.be.greaterThan(10);
+            expect(resp.body.token).to.be.a('string');
         });
     });
 
@@ -38,6 +43,7 @@ describe('Authentication API', () => {
             failOnStatusCode: false
         }).then((resp) => {
             expect(resp.status).to.eq(401);
+            expect(resp.body).to.exist;
         });
     });
 
@@ -49,6 +55,7 @@ describe('Authentication API', () => {
             failOnStatusCode: false
         }).then((resp) => {
             expect(resp.status).to.eq(401);
+            expect(resp.body).to.exist;
         });
     });
 
@@ -56,10 +63,11 @@ describe('Authentication API', () => {
         cy.request({
             method: 'POST',
             url: '/register',
-            body: { password: 'x' },
+            body: { username: '', password: 'x' },
             failOnStatusCode: false
         }).then((resp) => {
-            expect([400, 422, 500]).to.include(resp.status);
+            expect(resp.status).to.eq(400);
+            expect(resp.body).to.exist;
         });
     });
 
@@ -67,10 +75,11 @@ describe('Authentication API', () => {
         cy.request({
             method: 'POST',
             url: '/register',
-            body: { username: 'xx' },
+            body: { username: 'x', password: '' },
             failOnStatusCode: false
         }).then((resp) => {
-            expect([400, 422, 500]).to.include(resp.status);
+            expect(resp.status).to.eq(400);
+            expect(resp.body).to.exist;
         });
     });
 
@@ -81,7 +90,7 @@ describe('Authentication API', () => {
             body: {},
             failOnStatusCode: false
         }).then((resp) => {
-            expect([400, 422, 500]).to.include(resp.status);
+            expect(resp.status).to.eq(400);
         });
     });
 });

@@ -16,6 +16,10 @@ describe('Products API', () => {
         cy.request('GET', '/products').then((resp) => {
             expect(resp.status).to.eq(200);
             expect(resp.body).to.be.an('array');
+            expect(resp.body).to.not.be.null;
+            expect(resp.body.length).to.be.at.least(0);
+            expect(resp).to.have.property('status');
+            expect(resp.status).to.be.a('number');
         });
     });
 
@@ -28,6 +32,9 @@ describe('Products API', () => {
         }).then((resp) => {
             expect(resp.status).to.eq(201);
             expect(resp.body).to.include('Product added');
+            expect(resp.body).to.be.a('string');
+            expect(resp).to.have.property('status');
+            expect(resp.status).to.be.a('number');
         });
     });
 
@@ -38,7 +45,9 @@ describe('Products API', () => {
             body: { name: 'Bread' },
             failOnStatusCode: false
         }).then((resp) => {
-            expect([401, 403]).to.include(resp.status);
+            expect(resp.status).to.eq(401);
+            expect(resp).to.have.property('status');
+            expect(resp.status).to.be.a('number');
         });
     });
 
@@ -50,7 +59,9 @@ describe('Products API', () => {
             body: { name: '' },
             failOnStatusCode: false
         }).then((resp) => {
-            expect([400, 422, 500]).to.include(resp.status);
+            expect(resp.status).to.eq(400);
+            expect(resp).to.have.property('status');
+            expect(resp.status).to.be.a('number');
         });
     });
 
@@ -62,6 +73,9 @@ describe('Products API', () => {
             const milk = resp.body.find(p => p.name === 'Milk');
             expect(milk).to.exist;
             expect(milk).to.have.property('id');
+            expect(milk.id).to.be.a('string');
+            expect(resp).to.have.property('status');
+            expect(resp.status).to.be.a('number');
         });
     });
 
@@ -73,12 +87,18 @@ describe('Products API', () => {
             body: { name: 'Butter' }
         }).then((resp) => {
             expect(resp.status).to.eq(201);
+            expect(resp.body).to.exist;
+            expect(resp).to.have.property('status');
+            expect(resp.status).to.be.a('number');
         });
 
         cy.request('GET', '/products').then((resp) => {
             const butter = resp.body.find(p => p.name === 'Butter');
             expect(butter).to.exist;
             expect(butter).to.have.property('id');
+            expect(butter.id).to.be.a('string');
+            expect(resp).to.have.property('status');
+            expect(resp.status).to.be.a('number');
         });
     });
 });

@@ -28,6 +28,11 @@ fun Route.productRoutes() {
         authenticate("auth-jwt") {
             post {
                 val req = call.receive<ProductRequest>()
+
+                if (req.name == "") {
+                    call.respond(HttpStatusCode.BadRequest, "Product name can't be empty")
+                    return@post
+                }
                 transaction {
                     Products.insert {
                         it[name] = req.name
